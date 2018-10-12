@@ -1,0 +1,102 @@
+{
+  "fabric": {
+    "cryptodir": "network/fabric/distributed/crypto-config",
+    "network": {
+      "orderer": {
+        "url": "grpc://172.31.0.36:7050",
+        "mspid": "OrdererMSP",
+        "domain": "example.com",
+        "user": {
+          "key": "network/fabric/distributed/crypto-config/ordererOrganizations/example.com/users/Admin@example.com/msp/keystore/8d813cc114c3568849feafed8c3239c17833dc9e314851c242a99aa1fc2f695d_sk",
+          "cert": "network/fabric/distributed/crypto-config/ordererOrganizations/example.com/users/Admin@example.com/msp/signcerts/Admin@example.com-cert.pem"
+        },
+        "server-hostname": "orderer1.example.com",
+        "tls_cacerts": "network/fabric/distributed/crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/ca.crt"
+      },
+      "org1": {
+        "name": "peerOrg1",
+        "mspid": "Org1MSP",
+        "domain": "org1.example.com",
+        "user": {
+          "key": "network/fabric/distributed/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/d80070995754a484ef037955e40adb80034b7d61689b1ae384242882192a4ef5_sk",
+          "cert": "network/fabric/distributed/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/Admin@org1.example.com-cert.pem"
+        },
+        "peer1": {
+          "requests": "grpc://172.31.0.36:7051",
+          "events": "grpc://172.31.0.36:7053",
+          "server-hostname": "peer0.org1.example.com",
+          "tls_cacerts": "network/fabric/distributed/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt"
+        },
+        "peer2": {
+          "requests": "grpc://172.31.0.36:8051",
+          "events": "grpc://172.31.0.36:8053",
+          "server-hostname": "peer1.org1.example.com",
+          "tls_cacerts": "network/fabric/distributed/crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/tls/ca.crt"
+        }
+      },
+      "org2": {
+        "name": "peerOrg2",
+        "mspid": "Org2MSP",
+        "domain": "org2.example.com",
+        "user": {
+          "key": "network/fabric/distributed/crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/keystore/075e679a57b20b5676456d19ef9129b97070de881321814ae26837c1080b1b06_sk",
+          "cert": "network/fabric/distributed/crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/signcerts/Admin@org2.example.com-cert.pem"
+        },
+        "peer1": {
+          "requests": "grpc://172.31.0.41:9051",
+          "events": "grpc://172.31.0.41:9053",
+          "server-hostname": "peer0.org2.example.com",
+          "tls_cacerts": "network/fabric/distributed/crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt"
+        },
+        "peer2": {
+          "requests": "grpc://172.31.0.41:10051",
+          "events": "grpc://172.31.0.41:10053",
+          "server-hostname": "peer1.org2.example.com",
+          "tls_cacerts": "network/fabric/distributed/crypto-config/peerOrganizations/org2.example.com/peers/peer1.org2.example.com/tls/ca.crt"
+        }
+      }
+    },
+    "channel": [
+      {
+        "name": "mychannel",
+        "config": "network/fabric/distributed/channel-artifacts/channel.tx",
+        "organizations": ["org1", "org2"],
+        "deployed": false
+      }
+    ],
+    "chaincodes": [{"id": "simple", "path": "contract/fabric/simple/go", "language":"golang", "version": "v0", "channel": "mychannel"}],
+    "endorsement-policy": {
+      "identities": [
+        {
+          "role": {
+            "name": "member",
+            "mspId": "Org1MSP"
+          }
+        },
+        {
+          "role": {
+            "name": "member",
+            "mspId": "Org2MSP"
+          }
+        },
+        {
+          "role": {
+            "name": "admin",
+            "mspId": "Org1MSP"
+          }
+        }
+      ],
+      "policy": { "2-of": [{"signed-by": 0}, {"signed-by": 1}]}
+    },
+    "context": {
+      "open": "mychannel",
+      "query": "mychannel"
+    }
+  },
+  "info" : {
+    "Version": "1.2.0",
+    "Size": "4 Peers",
+    "Orderer": "Kafka",
+    "Distribution": "Two Host"
+  }
+}

@@ -1,0 +1,96 @@
+# COPYRIGHT Hello Corp. All Rights Reserved.
+#
+# Author: Haley
+#
+
+version: '2'
+
+services:
+  zk1:
+    extends:
+      file: zk1.yaml
+      service: zk1
+  zk2:
+    extends:
+      file: zk2.yaml
+      service: zk2
+    depends_on:
+      - zk1
+  zk3:
+    extends:
+      file: zk3.yaml
+      service: zk3
+    depends_on:
+#      - zk1
+      - zk2
+  kafka1:
+    extends:
+      file: kafka1.yaml
+      service: kafka1
+    depends_on:
+#      - zk1
+#      - zk2
+      - zk3
+  kafka2:
+    extends:
+      file: kafka2.yaml
+      service: kafka2
+    depends_on:
+#      - zk1
+#      - zk2
+#      - zk3
+      - kafka1
+  kafka3:
+    extends:
+      file: kafka3.yaml
+      service: kafka3
+    depends_on:
+#      - zk1
+#      - zk2
+#      - zk3
+#      - kafka1
+      - kafka2
+  kafka4:
+    extends:
+      file: kafka4.yaml
+      service: kafka4
+    depends_on:
+#      - zk1
+#      - zk2
+#      - zk3
+#      - kafka1
+#      - kafka2
+      - kafka3
+  orderer1.example.com:
+    extends:
+      file: orderer1.yaml
+      service: orderer1.example.com
+    depends_on:
+#      - kafka1
+#      - kafka2
+#      - kafka3
+      - kafka4
+  orderer2.example.com:
+    extends:
+      file: orderer2.yaml
+      service: orderer2.example.com
+    depends_on:
+      - orderer1.example.com
+  orderer3.example.com:
+    extends:
+      file: orderer3.yaml
+      service: orderer3.example.com
+    depends_on:
+      - orderer2.example.com
+  peer0.org1.example.com:
+    extends:
+      file: org1.yaml
+      service: peer0.org1.example.com
+    depends_on:
+      - orderer3.example.com
+  peer1.org1.example.com:
+    extends:
+      file: org1.yaml
+      service: peer1.org1.example.com
+    depends_on:
+      - peer0.org1.example.com

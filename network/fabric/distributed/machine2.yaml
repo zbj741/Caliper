@@ -1,0 +1,19 @@
+# COPYRIGHT Hello Corp. All Rights Reserved.
+#
+# Author: Haley
+#
+
+version: '2'
+
+services:
+  peer0.org2.example.com:
+    extends:
+      file: org2.yaml
+      service: peer0.org2.example.com
+
+  peer1.org2.example.com:
+    extends:
+      file: org2.yaml
+      service: peer1.org2.example.com
+    depends_on:
+      - peer0.org2.example.com
