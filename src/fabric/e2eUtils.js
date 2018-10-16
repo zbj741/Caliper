@@ -791,6 +791,61 @@ module.exports.querybycontext = querybycontext;
 
 
 
+function queryhistory(context, id, version, name) {
+    //const userOrg = context.org;
+    const client = context.client;
+    const channel = context.channel;
+    //const eventhubs = context.eventhubs;
+    const tx_id = client.newTransactionID();
+    const txStatus = new TxStatus(tx_id.getTransactionID());
+
+    // send query
+    const request = {
+        chaincodeId: id,
+        chaincodeVersion: version,
+        txId: tx_id,
+        fcn: 'history',
+        args: [name]
+    };
+
+    if(context.engine) {
+        context.engine.submitCallback(1);
+    }
+
+    return channel.queryByChaincode(request)
+        .then((responses) => {
+            if(responses.length > 0) {
+                const value = responses[0];
+                if(value instanceof Error) {
+                    throw value;
+                }
+
+                for(let i = 1 ; i < responses.length ; i++) {
+                    if(responses[i].length !== value.length || !responses[i].every(function(v,idx){
+                        return v === value[idx]; })) {
+                        throw new Error('conflicting query responses');
+                    }
+                }
+
+                txStatus.SetStatusSuccess();
+                txStatus.SetResult(responses[0]);
+                return Promise.resolve(txStatus);
+            }
+            else {
+                throw new Error('no query responses');
+            }
+        })
+        .catch((err) => {
+            commUtils.log('Query failed, ' + (err.stack?err.stack:err));
+            txStatus.SetStatusFail();
+            return Promise.resolve(txStatus);
+        });
+}
+
+module.exports.queryhistory = queryhistory;
+
+
+
 
 
 

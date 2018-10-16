@@ -151,6 +151,11 @@ class Fabric extends BlockchainInterface{
         return e2eUtils.querybycontext(context, contractID, contractVer, key.toString());
     }
 	
+	queryHistoryState(context, contractID, contractVer, key) {
+        // TODO: change string key to general object
+        return e2eUtils.queryhistory(context, contractID, contractVer, key.toString());
+    }
+	
 
 }
 module.exports = Fabric;

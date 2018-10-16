@@ -10,9 +10,12 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"encoding/json"
+
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
+	"github.com/hyperledger/fabric/protos/ledger/queryresult"
 )
 
 const ERROR_SYSTEM = "{\"code\":300, \"reason\": \"system error: %s\"}"
@@ -46,6 +49,9 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	}
 	if function == "transfer" {
 		return t.Transfer(stub, args)
+	}
+	if function == "history" {
+		return t.QueryHistory(stub, args)
 	}
 	
 
@@ -154,6 +160,68 @@ func (t *SimpleChaincode) Transfer(stub shim.ChaincodeStubInterface, args []stri
 	}
 
 	return shim.Success(nil)
+}
+
+// history callback representing the query of a chaincode
+func (t *SimpleChaincode) QueryHistory(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	var key string
+	var err error
+
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting =2")
+	}
+
+	key = args[0]
+
+	type History struct {
+		*queryresult.KeyModification `json:"history"`
+	}
+	result := struct {
+		Current struct {
+			Key   string `json:"key"`
+			Value string `json:"value"`
+		} `json:"current"`
+		Historys []History `json:"historys"`
+	}{}
+
+	// Get the state from the ledger
+	value, err := stub.GetState(key)
+	if err != nil {
+		jsonResp := "{\"Error\":\"Failed to get state for " + key + "\"}"
+		return shim.Error(jsonResp)
+	}
+
+	if value == nil {
+		// jsonResp := "{\"Error\":\"Nil amount for " + key + "\"}"
+		// return shim.Error(jsonResp)
+		return shim.Success(nil)
+	}
+
+	result.Current.Key = key
+	result.Current.Value = string(value)
+
+	historyIterator, err := stub.GetHistoryForKey(key)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	defer historyIterator.Close()
+
+	for i := 0; historyIterator.HasNext(); i++ {
+		history, err := historyIterator.Next()
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		result.Historys = append(result.Historys, History{history})
+	}
+
+	jsonResp, err := json.Marshal(result)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	// fmt.Printf("Query Response:%s\n", jsonResp)
+	return shim.Success(jsonResp)
 }
 
 
