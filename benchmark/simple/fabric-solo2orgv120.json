@@ -94,7 +94,8 @@
     },
     "context": {
       "open": "mychannel",
-      "query": "mychannel"
+      "query": "mychannel",
+	  "queryhistory": "mychannel"
     }
   },
   "info" : {

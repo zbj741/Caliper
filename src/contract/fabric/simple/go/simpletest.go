@@ -206,7 +206,7 @@ func (t *SimpleChaincode) QueryHistory(stub shim.ChaincodeStubInterface, args []
 	}
 	defer historyIterator.Close()
 
-	for i := 0; historyIterator.HasNext(); i++ {
+	for i := 0; historyIterator.HasNext() && i<1; i++ {
 		history, err := historyIterator.Next()
 		if err != nil {
 			return shim.Error(err.Error())
