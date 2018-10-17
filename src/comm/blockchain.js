@@ -139,6 +139,10 @@ class Blockchain {
         return this.bcObj.queryState(context, contractID, contractVer, key);
     }
 
+    queryHistoryState(context, contractID, contractVer, key) {
+        return this.bcObj.queryHistoryState(context, contractID, contractVer, key);
+    }
+
     /**
     * Calculate the default transaction statistics
     * @param {Array} results array of txStatus

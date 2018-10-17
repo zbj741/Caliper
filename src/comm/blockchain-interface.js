@@ -93,6 +93,10 @@ class BlockchainInterface {
         throw new Error('queryState is not implemented for this blockchain system');
     }
 
+    queryHistoryState(context, contractID, contractVer, key) {
+        throw new Error('queryHistoryState is not implemented for this blockchain system');
+    }
+
     /**
      * Get adapter specific transaction statistics
      * @param {JSON} stats txStatistics object
